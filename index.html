@@ -1375,8 +1375,21 @@
       letter-spacing: 0.5px;
       text-shadow: 0 2px 10px rgba(233, 196, 106, 0.3);
     }
+/* ===== FONT SCALE FIX (після переносу з Canva) ===== */
+:root { --ui-scale: 0.78; } /* міняй: 0.70..0.90 */
 
-    @media (max-width: 1400px) {
+.cover-content,
+.slide-header,
+.content-section,
+.nav-container {
+  zoom: var(--ui-scale);
+}
+
+/* (опційно) трохи зменшити водяний знак */
+.logo-watermark { zoom: 0.85; }
+
+/* ===== далі твій код без змін ===== */
+@media (max-width: 1400px) {
       .slide {
         padding: 25px 40px 80px;
       }
