@@ -2399,6 +2399,38 @@ window.addEventListener('orientationchange', fitToScreen);
       showSlide(currentSlide + direction);
       setTimeout(() => { canNavigate = true; }, navigationDelay);
     }
+<script>
+  // ... ваші існуючі const/let (slides, totalSlides, currentSlide, etc.)
+
+  const BASE_W = 1920;
+  const BASE_H = 1080;
+
+  // Це контейнер, який треба масштабувати (замініть селектор, якщо у вас інша назва)
+  const scaleRoot = document.querySelector('.presentation-container') || document.querySelector('.slides');
+
+  // Навігація (щоб відняти її висоту, якщо вона займає місце внизу)
+  const nav = document.querySelector('.navigation') || document.querySelector('.nav');
+
+  function fitToViewport() {
+    if (!scaleRoot) return;
+
+    const pad = 16; // безпечно, щоб не впиралось в краї
+    const navH = nav ? nav.getBoundingClientRect().height : 0;
+
+    const availW = window.innerWidth - pad * 2;
+    const availH = window.innerHeight - navH - pad * 2;
+
+    const scale = Math.min(availW / BASE_W, availH / BASE_H);
+
+    // ВАЖЛИВО: scaleRoot має бути position: fixed/absolute + top/left 50% (див. CSS нижче)
+    scaleRoot.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+
+  window.addEventListener('load', fitToViewport);
+  window.addEventListener('resize', fitToViewport);
+
+  // ... далі ваші animateCounters(), showSlide(), changeSlide(), keydown і т.д.
+</script>
 
     document.addEventListener('keydown', (e) => {
       if (!canNavigate) return;
