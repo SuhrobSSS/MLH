@@ -1421,41 +1421,52 @@
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
   <style>
-  /* --- Slide 1 bubbles (safe overlay) --- */
-  #slide1 { position: relative; }
+/* --- Slide 1 bubbles (small gold, top strip) --- */
+#slide1 { position: relative; }
 
-  #slide1 .bubbles{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    pointer-events:none;
-    z-index:1;
-  }
+#slide1 .bubbles{
+  position:absolute;
+  left:0; right:0; top:0;
+  height:18vh;                 /* тільки верх, як на фото */
+  overflow:hidden;
+  pointer-events:none;
+  z-index:2;
+}
 
-  #slide1 .bubble{
-    position:absolute;
-    bottom:-140px;
-    left:var(--left, 50%);
-    width:var(--size, 24px);
-    height:var(--size, 24px);
-    border-radius:50%;
-    opacity:var(--alpha, .14);
-    background: radial-gradient(circle at 30% 30%,
-      rgba(255,255,255,.28),
-      rgba(168,218,220,.08) 55%,
-      rgba(42,157,143,.03) 100%
-    );
-    transform: translate3d(0,0,0);
-    animation: bubble-rise var(--dur, 10s) linear infinite;
-  }
+#slide1 .bubble{
+  position:absolute;
+  bottom:-40px;
+  left:var(--left, 50%);
+  width:var(--size, 4px);
+  height:var(--size, 4px);
+  border-radius:50%;
+  opacity:var(--alpha, .18);
 
-  @keyframes bubble-rise{
-    0%   { transform: translate3d(0, 0, 0) scale(.9); }
-    20%  { transform: translate3d(10px, -20vh, 0) scale(1); }
-    60%  { transform: translate3d(-12px, -60vh, 0) scale(1.05); }
-    100% { transform: translate3d(8px, -110vh, 0) scale(1.1); }
-  }
+  /* золотий як шрифт (MTWTU LAW HUB) */
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255,255,255,.65) 0%,
+    rgba(233,196,106,.45) 40%,
+    rgba(233,196,106,.12) 60%,
+    rgba(233,196,106,0) 75%
+  );
+  box-shadow: 0 0 10px rgba(233,196,106,.18);
+  filter: blur(0.2px);
 
+  transform: translate3d(0,0,0);
+  animation: bubble-rise var(--dur, 10s) linear infinite;
+}
+
+/* рух такий самий “вгору”, просто в межах верхньої смуги */
+@keyframes bubble-rise{
+  0%   { transform: translate3d(0, 0, 0) scale(.95); }
+  20%  { transform: translate3d(6px, -6vh, 0) scale(1); }
+  60%  { transform: translate3d(-8px, -16vh, 0) scale(1.05); }
+  100% { transform: translate3d(5px, -28vh, 0) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #slide1 .bubble{ animation: none; }
+}
   @media (prefers-reduced-motion: reduce){
     #slide1 .bubble{ animation: none; }
   }
@@ -1465,9 +1476,10 @@
  <body>
   <div class="presentation-container">
    <!-- Slide 1: Cover -->
-   <div class="slide active" id="slide1">
+ <div class="slide active" id="slide1">
     <div class="particles" id="particles"></div>
     <div class="animated-lines" id="animatedLines"></div>
+    <div class="bubbles" id="bubbles1"></div>
     <div class="bubbles" id="bubbles" aria-hidden="true"></div>
     <div class="bubbles" id="bubbles" aria-hidden="true"></div>
     <div class="orb orb-1"></div>
@@ -2561,12 +2573,12 @@
     if (bubbles.dataset.ready === "1") return;
     bubbles.dataset.ready = "1";
 
-    const count = 16;
+    const count = 40;
     for (let i = 0; i < count; i++) {
       const b = document.createElement("span");
       b.className = "bubble";
 
-      const size = 10 + Math.random() * 42;       // 10..52px
+      const size = 2 + Math.random() * 4;       // 2..6px
       const left = Math.random() * 100;           // 0..100%
       const dur  = 8 + Math.random() * 10;        // 8..18s
       const delay = -Math.random() * dur;         // старт “в процесі”
