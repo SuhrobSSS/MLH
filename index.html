@@ -1420,12 +1420,56 @@
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+  <style>
+  /* --- Slide 1 bubbles (safe overlay) --- */
+  #slide1 { position: relative; }
+
+  #slide1 .bubbles{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  #slide1 .bubble{
+    position:absolute;
+    bottom:-140px;
+    left:var(--left, 50%);
+    width:var(--size, 24px);
+    height:var(--size, 24px);
+    border-radius:50%;
+    opacity:var(--alpha, .14);
+    background: radial-gradient(circle at 30% 30%,
+      rgba(255,255,255,.28),
+      rgba(168,218,220,.08) 55%,
+      rgba(42,157,143,.03) 100%
+    );
+    transform: translate3d(0,0,0);
+    animation: bubble-rise var(--dur, 10s) linear infinite;
+  }
+
+  @keyframes bubble-rise{
+    0%   { transform: translate3d(0, 0, 0) scale(.9); }
+    20%  { transform: translate3d(10px, -20vh, 0) scale(1); }
+    60%  { transform: translate3d(-12px, -60vh, 0) scale(1.05); }
+    100% { transform: translate3d(8px, -110vh, 0) scale(1.1); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #slide1 .bubble{ animation: none; }
+  }
+</style>
+
  </head>
  <body>
-  <div class="presentation-container"><!-- Slide 1: Cover -->
-   <div class="slide active">
+  <div class="presentation-container">
+   <!-- Slide 1: Cover -->
+   <div class="slide active" id="slide1">
     <div class="particles" id="particles"></div>
     <div class="animated-lines" id="animatedLines"></div>
+    <div class="bubbles" id="bubbles" aria-hidden="true"></div>
+    <div class="bubbles" id="bubbles" aria-hidden="true"></div>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
@@ -2507,5 +2551,37 @@
     createParticles();
     createAnimatedLines();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acd2cdf94bb70c2',t:'MTc2NTU0MjAyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acd2cdf94bb70c2',t:'MTc2NTU0MjAyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+ <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const bubbles = document.getElementById("bubbles");
+    if (!bubbles) return;
+
+    // щоб не дублювало пузирки при повторному запуску
+    if (bubbles.dataset.ready === "1") return;
+    bubbles.dataset.ready = "1";
+
+    const count = 16;
+    for (let i = 0; i < count; i++) {
+      const b = document.createElement("span");
+      b.className = "bubble";
+
+      const size = 10 + Math.random() * 42;       // 10..52px
+      const left = Math.random() * 100;           // 0..100%
+      const dur  = 8 + Math.random() * 10;        // 8..18s
+      const delay = -Math.random() * dur;         // старт “в процесі”
+      const alpha = 0.06 + Math.random() * 0.14;  // 0.06..0.20
+
+      b.style.setProperty("--size", `${size}px`);
+      b.style.setProperty("--left", `${left}%`);
+      b.style.setProperty("--dur", `${dur}s`);
+      b.style.setProperty("--alpha", `${alpha}`);
+      b.style.animationDelay = `${delay}s`;
+
+      bubbles.appendChild(b);
+    }
+  });
+</script>
+
+ </body>
 </html>
