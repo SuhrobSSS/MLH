@@ -2348,182 +2348,10 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
   };
 
   let currentSlide = 0;
-  const slides = document.querySelectorAll('.slide');
-  const totalSlides = slides.length;
-
-  const BASE_W = 1920;
-  const BASE_H = 1080;
-
-  const scaleRoot = document.getElementById('scaleRoot');
-  const nav = document.querySelector('.nav-container');
-
-  function fitToViewport() {
-  if (!scaleRoot) return;
-
-  const pad = 16;
-  const navH = nav ? (nav.getBoundingClientRect().height + 20) : 0;
-
-  const availW = window.innerWidth - pad * 2;
-  const availH = window.innerHeight - navH - pad * 2;
-
-  const scale = Math.min(1, availW / BASE_W, availH / BASE_H); // cap до 1, щоб не роздувало на великих екранах
-// зсув вгору на половину навігації, щоб центр був над панеллю
-  scaleRoot.style.top = `calc(50% - ${navH / 2}px)`;
-  scaleRoot.style.left = '50%';
-
-  scaleRoot.style.transform = `translate(-50%, -50%) scale(${scale})`;
-  }
-
-  window.addEventListener('load', fitToViewport);
-  window.addEventListener('resize', fitToViewport);
-  window.addEventListener('orientationchange', fitToViewport);
-
   let canNavigate = true;
   const navigationDelay = 400;
 
-  function animateCounters(slideEl) {
-    const counters = slideEl.querySelectorAll('.js-counter');
-    counters.forEach(counter => {
-      const target = parseInt(counter.getAttribute('data-target'), 10);
-      const suffix = counter.getAttribute('data-suffix') || '+';
-      if (!target || counter.dataset.animated === 'true') return;
-
-      let current = 0;
-      const duration = 2500;
-      const step = Math.max(Math.floor(target / (duration / 30)), 1);
-
-      const interval = setInterval(() => {
-        current += step;
-        if (current >= target) {
-          current = target;
-          clearInterval(interval);
-          counter.dataset.animated = 'true';
-        }
-        counter.textContent = current.toLocaleString('uk-UA') + suffix;
-      }, 30);
-    });
-  }
-
-  function showSlide(n) {
-    slides[currentSlide].classList.remove('active');
-    currentSlide = (n + totalSlides) % totalSlides;
-    slides[currentSlide].classList.add('active');
-
-    document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
-    document.getElementById('prevBtn').disabled = currentSlide === 0;
-    document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
-
-    animateCounters(slides[currentSlide]);
-  }
-
-  function changeSlide(direction) {
-    if (!canNavigate) return;
-    canNavigate = false;
-    showSlide(currentSlide + direction);
-    setTimeout(() => { canNavigate = true; }, navigationDelay);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (!canNavigate) return;
-
-    if (e.key === 'ArrowLeft' && currentSlide > 0) {
-      e.preventDefault();
-      changeSlide(-1);
-    } else if (e.key === 'ArrowRight' && currentSlide < totalSlides - 1) {
-      e.preventDefault();
-      changeSlide(1);
-    } else if ((e.key === 'PageDown' || e.key === ' ') && currentSlide < totalSlides - 1) {
-      e.preventDefault();
-      changeSlide(1);
-    } else if (e.key === 'PageUp' && currentSlide > 0) {
-      e.preventDefault();
-      changeSlide(-1);
-    }
-  });
-
-  // Touch
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  });
-
-  document.addEventListener('touchend', (e) => {
-    if (!canNavigate) return;
-    touchEndX = e.changedTouches[0].screenX;
-    const swipeThreshold = 50;
-
-    if (touchEndX < touchStartX - swipeThreshold && currentSlide < totalSlides - 1) changeSlide(1);
-    if (touchEndX > touchStartX + swipeThreshold && currentSlide > 0) changeSlide(-1);
-  });
-
-  async function onConfigChange(config) {
-    const mainTitle = config.main_title || defaultConfig.main_title;
-    const subtitle = config.subtitle || defaultConfig.subtitle;
-
-    const mainTitleEl = document.getElementById('main-title');
-    const subtitleEl = document.getElementById('subtitle');
-
-    if (mainTitleEl) mainTitleEl.textContent = mainTitle;
-    if (subtitleEl) subtitleEl.innerHTML = subtitle;
-  }
-
-  const element = {
-    defaultConfig,
-    onConfigChange,
-    mapToCapabilities: () => ({
-      recolorables: [],
-      borderables: [],
-      fontEditable: undefined,
-      fontSizeable: undefined
-    }),
-    mapToEditPanelValues: (config) => new Map([
-      ["main_title", config.main_title || defaultConfig.main_title],
-      ["subtitle", config.subtitle || defaultConfig.subtitle]
-    ])
-  };
-
-  if (window.elementSdk) window.elementSdk.init(element);
-
-  function createParticles() {
-    const particlesContainer = document.getElementById('particles');
-    if (!particlesContainer) return;
-
-    const particleCount = 40;
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 20 + 's';
-      particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-      particlesContainer.appendChild(particle);
-    }
-  }
-
-  function createAnimatedLines() {
-    const linesContainer = document.getElementById('animatedLines');
-    if (!linesContainer) return;
-
-    const lineCount = 5;
-    for (let i = 0; i < lineCount; i++) {
-      const line = document.createElement('div');
-      line.className = 'moving-line';
-      line.style.top = (20 + i * 20) + '%';
-      line.style.animationDelay = (i * 1.5) + 's';
-      line.style.animationDuration = (6 + Math.random() * 4) + 's';
-      linesContainer.appendChild(line);
-    }
-  }
-
- <script>
-  const defaultConfig = {
-    main_title: "MTWTU LAW HUB",
-    subtitle: "Instagram • Facebook • TikTok"
-  };
-
-  let currentSlide = 0;
-  const slides = document.querySelectorAll('.slide');
+  const slides = Array.from(document.querySelectorAll('.slide'));
   const totalSlides = slides.length;
 
   const BASE_W = 1920;
@@ -2536,7 +2364,7 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     if (!scaleRoot) return;
 
     const pad = 16;
-    const navH = nav ? (nav.getBoundingClientRect().height + 20) : 0;
+    const navH = nav ? (nav.getBoundingClientRect().height + 24) : 0;
 
     const availW = window.innerWidth - pad * 2;
     const availH = window.innerHeight - navH - pad * 2;
@@ -2547,9 +2375,6 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     scaleRoot.style.top = `calc(50% - ${navH / 2}px)`;
     scaleRoot.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
-
-  let canNavigate = true;
-  const navigationDelay = 400;
 
   function animateCounters(slideEl) {
     const counters = slideEl.querySelectorAll('.js-counter');
@@ -2575,15 +2400,23 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
   }
 
   function showSlide(n) {
+    if (!slides.length) return;
+
     slides[currentSlide].classList.remove('active');
-    currentSlide = (n + totalSlides) % totalSlides;
+
+    currentSlide = Math.max(0, Math.min(n, totalSlides - 1));
     slides[currentSlide].classList.add('active');
 
-    document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
-    document.getElementById('prevBtn').disabled = currentSlide === 0;
-    document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    const counterEl = document.getElementById('slideCounter');
+    if (counterEl) counterEl.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (prevBtn) prevBtn.disabled = currentSlide === 0;
+    if (nextBtn) nextBtn.disabled = currentSlide === totalSlides - 1;
 
     animateCounters(slides[currentSlide]);
+    fitToViewport(); // важливо: інколи висота слайда/навігації змінюється
   }
 
   function changeSlide(direction) {
@@ -2592,6 +2425,9 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     showSlide(currentSlide + direction);
     setTimeout(() => { canNavigate = true; }, navigationDelay);
   }
+
+  // щоб працювали onclick="changeSlide(...)"
+  window.changeSlide = changeSlide;
 
   document.addEventListener('keydown', (e) => {
     if (!canNavigate) return;
@@ -2611,12 +2447,12 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     }
   });
 
-  // Touch
+  // Touch swipe
   let touchStartX = 0;
 
   document.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].screenX;
-  });
+  }, { passive: true });
 
   document.addEventListener('touchend', (e) => {
     if (!canNavigate) return;
@@ -2625,7 +2461,7 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
 
     if (touchEndX < touchStartX - swipeThreshold && currentSlide < totalSlides - 1) changeSlide(1);
     if (touchEndX > touchStartX + swipeThreshold && currentSlide > 0) changeSlide(-1);
-  });
+  }, { passive: true });
 
   async function onConfigChange(config) {
     const mainTitle = config.main_title || defaultConfig.main_title;
@@ -2653,13 +2489,15 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     ])
   };
 
-  if (window.elementSdk) window.elementSdk.init(element);
+  if (window.elementSdk && window.elementSdk.init) window.elementSdk.init(element);
 
   function createParticles() {
     const particlesContainer = document.getElementById('particles');
     if (!particlesContainer) return;
 
+    particlesContainer.innerHTML = '';
     const particleCount = 40;
+
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.className = 'particle';
@@ -2674,7 +2512,9 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     const linesContainer = document.getElementById('animatedLines');
     if (!linesContainer) return;
 
+    linesContainer.innerHTML = '';
     const lineCount = 5;
+
     for (let i = 0; i < lineCount; i++) {
       const line = document.createElement('div');
       line.className = 'moving-line';
@@ -2685,26 +2525,15 @@ body { overflow: hidden; display: flex; align-items: center; justify-content: ce
     }
   }
 
-  function init() {
-    if (!slides.length) {
-      console.warn('No slides found');
-      return;
-    }
-
+  window.addEventListener('load', () => {
     fitToViewport();
-    showSlide(0);
-    createParticles();
-    createAnimatedLines();
-  }
+    showSlide(0);          // ініціалізація кнопок/лічильника
+    createParticles();     // фон на 1 слайді
+    createAnimatedLines(); // фон на 1 слайді
+  });
 
   window.addEventListener('resize', fitToViewport);
   window.addEventListener('orientationchange', fitToViewport);
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
 </script>
       </body>
 </html>
